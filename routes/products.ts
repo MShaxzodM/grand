@@ -13,6 +13,21 @@ productsRouter.post("/", async (req, res) => {
     res.send(crproduct.id);
 });
 
+productsRouter.get("/", async (req, res) => {
+    try {
+        const search = req.query.search ? req.query.search : "";
+        // const limit:number = req.query.limit ? req.query.limit as undefined | number : 10;
+        const offset = req.query.offset ? req.query.offset : 1;
+
+        const products = await Product.findAll({
+            include: [Products],
+        });
+        res.send(products);
+    } catch (error) {
+        res.send(error);
+    }
+});
+
 productsRouter.put("/", async (req, res) => {
     try {
         const which_product = await Product.findByPk(req.body.product_id);

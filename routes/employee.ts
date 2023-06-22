@@ -15,6 +15,16 @@ positionRouter.post("/", async (req, res) => {
 
 const employeeRouter = Router();
 
+employeeRouter.get("/", async (req, res) => {
+    const employees = await PositionModel.findAll({
+        include: [EmployeeModel],
+        where: {
+            id: 1,
+        },
+    });
+    res.send(employees);
+});
+
 employeeRouter.post("/", async (req, res) => {
     try {
         const employee = EmployeeModel.create(req.body);

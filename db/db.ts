@@ -192,4 +192,9 @@ EmployeeModel.init(
     }
 );
 
+PositionModel.hasMany(EmployeeModel, { foreignKey: "position_id" });
+EmployeeModel.belongsTo(PositionModel, { foreignKey: "position_id" });
+Product.hasMany(Products, { foreignKey: "product_id" });
+Products.belongsTo(Product, { foreignKey: "product_id" });
+
 export { Product, Products, Category, History, PositionModel, EmployeeModel };
