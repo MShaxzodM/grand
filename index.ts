@@ -1,5 +1,6 @@
 import bodyParser from "body-parser";
 // import { Auth } from "./auth";
+import { config } from "dotenv";
 import express from "express";
 import { categoryRouter } from "./routes/category";
 import { product } from "./routes/product";
@@ -7,6 +8,7 @@ import { employeeRouter, positionRouter } from "./routes/employee";
 
 import cors from "cors";
 // import {  } from "./db/db";
+config();
 const app = express();
 app.use(cors({ origin: "*" }));
 app.use((req, res, next) => {
@@ -31,4 +33,4 @@ app.use("/category", categoryRouter);
 // app.post("/auth", Auth, (req: any, res) => {
 //     res.send("Siz muvaffaqiyatli royhatdan otdingiz");
 // });
-app.listen(3000, () => console.log("Goo"));
+app.listen(process.env.PORT, () => console.log("Goo"));
