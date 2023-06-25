@@ -1,7 +1,6 @@
 import { Router } from "express";
-import { EmployeeModel } from "../db/db";
-import { PositionModel } from "../db/db";
-
+import { PositionModel, AttendanceModel, EmployeeModel } from "../db/db";
+import { Op } from "sequelize";
 const positionRouter = Router();
 positionRouter.post("/", async (req, res) => {
     try {
@@ -33,4 +32,27 @@ employeeRouter.post("/", async (req, res) => {
         res.send("something went wrong");
     }
 });
+
+employeeRouter.get("/attendance", async (req, res) => {
+    const month = req.query.month ? req.query.month : "%";
+    const data = await EmployeeModel.findAll({
+        include: [AttendanceModel],
+        where: {
+            date: {
+                [Op.like]: `%-${month}-%`,
+            },
+        },
+        order: [[AttendanceModel, "date"]],
+    });
+});
+
+employeeRouter.post("/attendance", async (req, res) => {
+    try {
+        const attendance = await AttendanceModel.create(req.body);
+        res.send(attendance.id);
+    } catch (error) {
+        res.send(error);
+    }
+});
+
 export { employeeRouter, positionRouter };

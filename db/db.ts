@@ -192,9 +192,48 @@ EmployeeModel.init(
     }
 );
 
+class AttendanceModel extends Model {
+    id(id: any) {
+        throw new Error("Method not implemented.");
+    }
+}
+AttendanceModel.init(
+    {
+        employee_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        status: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false,
+        },
+        date: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
+    },
+    {
+        sequelize, // We need to pass the connection instance
+        timestamps: false,
+        freezeTableName: true,
+        modelName: "attendance", // We need to choose the model name
+    }
+);
+
+EmployeeModel.hasMany(AttendanceModel, { foreignKey: "employee_id" });
+AttendanceModel.belongsTo(EmployeeModel, { foreignKey: "employee_id" });
+
 PositionModel.hasMany(EmployeeModel, { foreignKey: "position_id" });
 EmployeeModel.belongsTo(PositionModel, { foreignKey: "position_id" });
 Product.hasMany(Products, { foreignKey: "product_id" });
 Products.belongsTo(Product, { foreignKey: "product_id" });
 
-export { Product, Products, Category, History, PositionModel, EmployeeModel };
+export {
+    Product,
+    Products,
+    Category,
+    History,
+    PositionModel,
+    EmployeeModel,
+    AttendanceModel,
+};
