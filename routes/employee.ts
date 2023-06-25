@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { PositionModel, AttendanceModel, EmployeeModel } from "../db/db";
-import { Op } from "sequelize";
+import { Op, Sequelize } from "sequelize";
 const positionRouter = Router();
 positionRouter.post("/", async (req, res) => {
     try {
@@ -40,11 +40,16 @@ employeeRouter.get("/attendance", async (req, res) => {
             include: [
                 {
                     model: AttendanceModel,
-                    where: {
-                        date: {
-                            [Op.like]: `%-${month}-%`,
-                        },
-                    },
+                    where: Sequelize.where(
+                        Sequelize.fn(
+                            "date_format",
+                            Sequelize.col("AttendanceModel.date"),
+                            "%Y-%m"
+                        ),
+                        {
+                            [Op.like]: `${month}-%`,
+                        }
+                    ),
                 },
             ],
             order: [[AttendanceModel, "date", "ASC"]],
