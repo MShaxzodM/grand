@@ -37,12 +37,16 @@ employeeRouter.get("/attendance", async (req, res) => {
     try {
         const month = req.query.month ? req.query.month : "%";
         const data = await EmployeeModel.findAll({
-            include: [AttendanceModel],
-            where: {
-                date: {
-                    [Op.like]: `%-${month}-%`,
+            include: [
+                {
+                    model: AttendanceModel,
+                    where: {
+                        date: {
+                            [Op.like]: `%-${month}-%`,
+                        },
+                    },
                 },
-            },
+            ],
             order: [[AttendanceModel, "date", "ASC"]],
         });
         res.send(data);
