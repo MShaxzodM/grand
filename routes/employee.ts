@@ -44,6 +44,7 @@ employeeRouter.get("/attendance", async (req, res) => {
         },
         order: [[AttendanceModel, "date"]],
     });
+    res.send(data);
 });
 
 employeeRouter.post("/attendance", async (req, res) => {
