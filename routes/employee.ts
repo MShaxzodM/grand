@@ -40,11 +40,6 @@ employeeRouter.get("/attendance", async (req, res) => {
             include: [
                 {
                     model: AttendanceModel,
-                    where: {
-                        date: {
-                            [Op.like]: `%-${month}-%`,
-                        },
-                    },
                 },
             ],
             order: [[AttendanceModel, "date", "ASC"]],
