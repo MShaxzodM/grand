@@ -5,6 +5,7 @@ import express from "express";
 import { categoryRouter } from "./routes/category";
 import { product } from "./routes/product";
 import { employeeRouter, positionRouter } from "./routes/employee";
+import { StatisticsRouter } from "./routes/statistics";
 
 import cors from "cors";
 // import {  } from "./db/db";
@@ -29,6 +30,7 @@ app.use("/position", positionRouter);
 app.use("/product", product);
 app.use("/employees", employeeRouter);
 app.use("/category", categoryRouter);
+app.use("/stats", StatisticsRouter);
 
 // app.post("/auth", Auth, (req: any, res) => {
 //     res.send("Siz muvaffaqiyatli royhatdan otdingiz");

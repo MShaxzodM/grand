@@ -11,17 +11,38 @@ positionRouter.post("/", async (req, res) => {
         res.send("Something went wrong");
     }
 });
-
+positionRouter.get("/", async (req, res) => {
+    try {
+        const positions = await PositionModel.findAll();
+        res.send(positions);
+    } catch (err) {
+        res.send(err);
+    }
+});
 const employeeRouter = Router();
 
 employeeRouter.get("/", async (req, res) => {
-    const employees = await PositionModel.findAll({
-        include: [EmployeeModel],
-        where: {
-            id: 1,
-        },
-    });
-    res.send(employees);
+    try {
+        const search = req.query.search ? req.query.search : "";
+        const limit = req.query.limit ? req.query.limit : 10;
+        const offset = req.query.offset ? req.query.offset : 0;
+        const employees = await EmployeeModel.findAll({
+            include: { model: PositionModel, attributes: ["title", "salary"] },
+            where: {
+                name: {
+                    [Op.iLike]: `${search}%`,
+                },
+                surname: {
+                    [Op.iLike]: `${search}%`,
+                },
+            },
+            limit: limit as number,
+            offset: offset as number,
+        });
+        res.send(employees);
+    } catch (err) {
+        res.send(err);
+    }
 });
 
 employeeRouter.post("/", async (req, res) => {

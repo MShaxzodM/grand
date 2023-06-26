@@ -7,6 +7,7 @@ const sequelize = new Sequelize(
     "postgres",
     process.env.POSTGRES_PASSWORD,
     {
+        port: 5432,
         host: "localhost",
         dialect: "postgres",
     }
@@ -222,13 +223,15 @@ AttendanceModel.init(
 
 EmployeeModel.hasMany(AttendanceModel, { foreignKey: "employee_id" });
 AttendanceModel.belongsTo(EmployeeModel, { foreignKey: "employee_id" });
-
+Product.belongsTo(Category, { foreignKey: "category_id" });
+Category.hasMany(Product, { foreignKey: "category_id" });
 PositionModel.hasMany(EmployeeModel, { foreignKey: "position_id" });
 EmployeeModel.belongsTo(PositionModel, { foreignKey: "position_id" });
 Product.hasMany(Products, { foreignKey: "product_id" });
 Products.belongsTo(Product, { foreignKey: "product_id" });
 
 export {
+    sequelize,
     Product,
     Products,
     Category,

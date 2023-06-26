@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { Product, Products, History } from "../db/db";
+import { Product, Products, History, sequelize } from "../db/db";
 
+import { Op } from "sequelize";
 const productsRouter = Router();
 productsRouter.post("/", async (req, res) => {
     const crproduct = await Products.create(req.body);
@@ -15,12 +16,19 @@ productsRouter.post("/", async (req, res) => {
 
 productsRouter.get("/", async (req, res) => {
     try {
+        const limit = req.query.limit ? req.query.limit : 10;
+        const offset = req.query.offset ? req.query.offset : 0;
         const search = req.query.search ? req.query.search : "";
-        // const limit:number = req.query.limit ? req.query.limit as undefined | number : 10;
-        const offset = req.query.offset ? req.query.offset : 1;
 
         const products = await Product.findAll({
             include: [Products],
+            where: {
+                name: {
+                    [Op.iLike]: `${search}%`,
+                },
+            },
+            limit: limit as number,
+            offset: offset as number,
         });
         res.send(products);
     } catch (error) {
