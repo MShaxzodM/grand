@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { Product, Products, History, sequelize } from "../db/db";
+import { Product, Products, History, sequelize, Category } from "../db/db";
 
 import { Op } from "sequelize";
 const productsRouter = Router();
@@ -20,8 +20,11 @@ productsRouter.get("/", async (req, res) => {
         const offset = req.query.offset ? req.query.offset : 0;
         const search = req.query.search ? req.query.search : "";
 
-        const products = await Product.findAll({
-            include: [Products],
+        const Maxsulotlar = await Product.findAll({
+            include: [
+                { model: Category, attributes: ["name"] },
+                { model: Products },
+            ],
             where: {
                 name: {
                     [Op.iLike]: `${search}%`,
@@ -30,7 +33,15 @@ productsRouter.get("/", async (req, res) => {
             limit: limit as number,
             offset: offset as number,
         });
-        res.send(products);
+        const count = await Product.count({
+            where: {
+                name: {
+                    [Op.iLike]: `${search}%`,
+                },
+            },
+        });
+        const response = { count, Maxsulotlar };
+        res.send(response);
     } catch (error) {
         res.send(error);
     }

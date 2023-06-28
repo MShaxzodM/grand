@@ -39,7 +39,18 @@ employeeRouter.get("/", async (req, res) => {
             limit: limit as number,
             offset: offset as number,
         });
-        res.send(employees);
+        const count = await EmployeeModel.count({
+            where: {
+                name: {
+                    [Op.iLike]: `${search}%`,
+                },
+                surname: {
+                    [Op.iLike]: `${search}%`,
+                },
+            },
+        });
+        const response = { count, employees };
+        res.send(response);
     } catch (err) {
         res.send(err);
     }

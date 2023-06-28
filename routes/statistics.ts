@@ -4,7 +4,7 @@ const StatisticsRouter = Router();
 
 StatisticsRouter.get("/", async (req, res) => {
     try {
-        const statistics = await History.findAll({ group: "products_id" });
+        const statistics = await History.findAll({});
 
         res.send(statistics);
     } catch (err) {
