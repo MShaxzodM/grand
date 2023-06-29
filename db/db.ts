@@ -97,7 +97,7 @@ History.init(
             allowNull: false,
         },
         date: {
-            type: DataTypes.DATE,
+            type: DataTypes.DATEONLY,
             allowNull: false,
         },
     },
@@ -221,6 +221,35 @@ AttendanceModel.init(
     }
 );
 
+class SalaryModel extends Model {
+    id(id: any) {
+        throw new Error("Method not implemented.");
+    }
+}
+SalaryModel.init(
+    {
+        employee_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        amount: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        date: {
+            type: DataTypes.DATEONLY,
+            allowNull: false,
+        },
+    },
+    {
+        sequelize, // We need to pass the connection instance
+        timestamps: false,
+        freezeTableName: true,
+        modelName: "salary", // We need to choose the model name
+    }
+);
+EmployeeModel.hasMany(SalaryModel, { foreignKey: "employee_id" });
+SalaryModel.belongsTo(EmployeeModel, { foreignKey: "employee_id" });
 EmployeeModel.hasMany(AttendanceModel, { foreignKey: "employee_id" });
 AttendanceModel.belongsTo(EmployeeModel, { foreignKey: "employee_id" });
 Product.belongsTo(Category, { foreignKey: "category_id" });
@@ -228,7 +257,9 @@ Category.hasMany(Product, { foreignKey: "category_id" });
 PositionModel.hasMany(EmployeeModel, { foreignKey: "position_id" });
 EmployeeModel.belongsTo(PositionModel, { foreignKey: "position_id" });
 Product.hasMany(Products, { foreignKey: "product_id" });
-Products.belongsTo(Product, { foreignKey: "product_id" });
+Products.belongsTo(Product, { as: "Maxsulot", foreignKey: "product_id" });
+History.belongsTo(Products, { foreignKey: "products_id" });
+Products.hasMany(History, { foreignKey: "products_id" });
 
 export {
     sequelize,
@@ -237,6 +268,7 @@ export {
     Category,
     History,
     PositionModel,
+    SalaryModel,
     EmployeeModel,
     AttendanceModel,
 };

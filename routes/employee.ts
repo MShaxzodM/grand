@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { PositionModel, AttendanceModel, EmployeeModel } from "../db/db";
+import {
+    PositionModel,
+    AttendanceModel,
+    SalaryModel,
+    EmployeeModel,
+} from "../db/db";
 import { Op } from "sequelize";
 const positionRouter = Router();
 positionRouter.post("/", async (req, res) => {
