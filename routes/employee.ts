@@ -34,27 +34,115 @@ employeeRouter.get("/", async (req, res) => {
         const employees = await EmployeeModel.findAll({
             include: { model: PositionModel, attributes: ["title", "salary"] },
             where: {
-                name: {
-                    [Op.iLike]: `${search}%`,
-                },
-                surname: {
-                    [Op.iLike]: `${search}%`,
-                },
+                [Op.or]: [
+                    {
+                        name: {
+                            [Op.iLike]: `${search}%`,
+                        },
+                    },
+                    {
+                        surname: {
+                            [Op.iLike]: `${search}%`,
+                        },
+                    },
+                ],
             },
             limit: limit as number,
             offset: offset as number,
         });
         const count = await EmployeeModel.count({
             where: {
-                name: {
-                    [Op.iLike]: `${search}%`,
-                },
-                surname: {
-                    [Op.iLike]: `${search}%`,
-                },
+                [Op.or]: [
+                    {
+                        name: {
+                            [Op.iLike]: `${search}%`,
+                        },
+                    },
+                    {
+                        surname: {
+                            [Op.iLike]: `${search}%`,
+                        },
+                    },
+                ],
             },
         });
         const response = { count, employees };
+        res.send(response);
+    } catch (err) {
+        res.send(err);
+    }
+});
+
+employeeRouter.post("/salary", async (req, res) => {
+    try {
+        const salary = await SalaryModel.create(req.body);
+        res.send(salary.id);
+    } catch (err) {
+        res.send(err);
+    }
+});
+employeeRouter.get("/salary", async (req, res) => {
+    try {
+        const limit = req.query.limit ? req.query.limit : 10;
+        const offset = req.query.offset ? req.query.offset : 0;
+        const search = req.query.search ? req.query.search : "";
+        const employee_id = req.query.employee_id;
+        let whereClause: any = {};
+        if (employee_id !== undefined) {
+            whereClause = {
+                employee_id: {
+                    [Op.eq]: employee_id,
+                },
+            };
+        } else {
+            whereClause = true;
+        }
+        const salary = await SalaryModel.findAll({
+            include: [
+                {
+                    model: EmployeeModel,
+                    where: {
+                        [Op.or]: [
+                            {
+                                name: {
+                                    [Op.iLike]: `${search}%`,
+                                },
+                            },
+                            {
+                                surname: {
+                                    [Op.iLike]: `${search}%`,
+                                },
+                            },
+                        ],
+                    },
+                },
+            ],
+            // where: whereClause,
+            limit: limit as number,
+            offset: offset as number,
+        });
+        const count = await SalaryModel.count({
+            include: [
+                {
+                    model: EmployeeModel,
+                    where: {
+                        [Op.or]: [
+                            {
+                                name: {
+                                    [Op.iLike]: `${search}%`,
+                                },
+                            },
+                            {
+                                surname: {
+                                    [Op.iLike]: `${search}%`,
+                                },
+                            },
+                        ],
+                    },
+                },
+            ],
+        });
+        const response = { count, salary };
         res.send(response);
     } catch (err) {
         res.send(err);
