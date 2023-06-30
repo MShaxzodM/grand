@@ -19,17 +19,39 @@ productsRouter.get("/", async (req, res) => {
         const limit = req.query.limit ? req.query.limit : 10;
         const offset = req.query.offset ? req.query.offset : 0;
         const search = req.query.search ? req.query.search : "";
-
-        const Maxsulotlar = await Product.findAll({
-            include: [
-                { model: Category, attributes: ["name"] },
-                { model: Products },
-            ],
-            where: {
+        const category_id = req.query.category_id;
+        let whereClause: any = {};
+        if (category_id !== undefined) {
+            whereClause = {
+                category_id: {
+                    [Op.eq]: category_id,
+                },
                 name: {
                     [Op.iLike]: `${search}%`,
                 },
-            },
+            };
+        } else {
+            whereClause = {
+                name: {
+                    [Op.iLike]: `${search}%`,
+                },
+            };
+        }
+        const Maxsulotlar = await Product.findAll({
+            include: [
+                {
+                    model: Category,
+                    attributes: ["name"],
+                },
+                {
+                    model: Products,
+                    where: {
+                        quantity: { [Op.gt]: 0 },
+                    },
+                },
+            ],
+            where: whereClause,
+
             limit: limit as number,
             offset: offset as number,
         });

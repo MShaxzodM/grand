@@ -6,7 +6,7 @@ import { categoryRouter } from "./routes/category";
 import { product } from "./routes/product";
 import { employeeRouter, positionRouter } from "./routes/employee";
 import { StatisticsRouter } from "./routes/statistics";
-
+import { incomeRouter } from "./routes/income";
 import cors from "cors";
 // import {  } from "./db/db";
 config();
@@ -31,6 +31,7 @@ app.use("/product", product);
 app.use("/employees", employeeRouter);
 app.use("/category", categoryRouter);
 app.use("/stats", StatisticsRouter);
+app.use("/income", incomeRouter);
 
 // app.post("/auth", Auth, (req: any, res) => {
 //     res.send("Siz muvaffaqiyatli royhatdan otdingiz");

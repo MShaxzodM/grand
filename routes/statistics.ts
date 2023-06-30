@@ -57,8 +57,18 @@ StatisticsRouter.get("/", async (req, res) => {
             limit: limit as number,
             offset: offset as number,
         });
-
-        res.send(statistics);
+        const count = await History.count({
+            where: {
+                type: {
+                    [Op.iLike]: `${type}%`,
+                },
+                date: {
+                    [Op.between]: [startDate, endDate],
+                },
+            },
+        });
+        const response = { count, statistics };
+        res.send(response);
     } catch (err) {
         res.send(err);
     }
