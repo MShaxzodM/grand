@@ -184,6 +184,18 @@ EmployeeModel.init(
             type: DataTypes.DATE,
             allowNull: false,
         },
+        branch_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+        },
+        phone: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        avatar: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
     },
     {
         sequelize, // We need to pass the connection instance

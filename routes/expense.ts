@@ -1,18 +1,18 @@
 import { Router } from "express";
-import IncomeModel from "../db/income.model";
+import OutgoneModel from "../db/outgoing.model";
 import { Op } from "sequelize";
+const expense_router = Router();
 
-const incomeRouter = Router();
-
-incomeRouter.post("/", async (req, res) => {
+expense_router.post("/", async (req, res) => {
     try {
-        const income = await IncomeModel.create(req.body);
-        res.send(income.id);
+        const expense = await OutgoneModel.create(req.body);
+        res.send(expense.id);
     } catch (err) {
         res.send(err);
     }
 });
-incomeRouter.get("/", async (req, res) => {
+
+expense_router.get("/", async (req, res) => {
     try {
         const search = req.query.search ? req.query.search : "";
         const limit = req.query.limit ? req.query.limit : 10;
@@ -21,9 +21,9 @@ incomeRouter.get("/", async (req, res) => {
             ? req.query.startDate
             : "2023-01-01";
         const endDate = req.query.endDate ? req.query.endDate : new Date();
-        const Finance_income = await IncomeModel.findAll({
+        const Finance_outgone = await OutgoneModel.findAll({
             where: {
-                type: {
+                description: {
                     [Op.iLike]: `${search}%`,
                 },
                 date: {
@@ -33,9 +33,9 @@ incomeRouter.get("/", async (req, res) => {
             limit: limit as number,
             offset: offset as number,
         });
-        const count = await IncomeModel.count({
+        const count = await OutgoneModel.count({
             where: {
-                type: {
+                description: {
                     [Op.iLike]: `${search}%`,
                 },
                 date: {
@@ -43,9 +43,10 @@ incomeRouter.get("/", async (req, res) => {
                 },
             },
         });
-        res.send({ count, Finance_income });
+        res.send({ count, Finance_outgone });
     } catch (err) {
         res.send(err);
     }
 });
-export { incomeRouter };
+
+export default expense_router;

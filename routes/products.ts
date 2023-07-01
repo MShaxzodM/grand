@@ -1,6 +1,5 @@
 import { Router } from "express";
 import { Product, Products, History, sequelize, Category } from "../db/db";
-
 import { Op } from "sequelize";
 const productsRouter = Router();
 productsRouter.post("/", async (req, res) => {
@@ -55,6 +54,20 @@ productsRouter.get("/", async (req, res) => {
             limit: limit as number,
             offset: offset as number,
         });
+        const Total_sum: any = await Products.findOne({
+            attributes: [
+                [
+                    sequelize.fn(
+                        "sum",
+                        sequelize.literal(
+                            '"products"."price" * "products"."quantity"'
+                        )
+                    ),
+                    "total_sum",
+                ],
+            ],
+        });
+
         const count = await Product.count({
             where: {
                 name: {
@@ -62,7 +75,8 @@ productsRouter.get("/", async (req, res) => {
                 },
             },
         });
-        const response = { count, Maxsulotlar };
+        const total_sum = Total_sum.get("total_sum");
+        const response = { count, total_sum, Maxsulotlar };
         res.send(response);
     } catch (error) {
         res.send(error);

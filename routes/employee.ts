@@ -1,10 +1,16 @@
 import { Router } from "express";
+import multer from "multer";
+import { S3Client } from "@aws-sdk/client-s3";
+import { deleteFile, getObjectSignedUrl } from "../aws/s3";
 import {
     PositionModel,
     AttendanceModel,
     SalaryModel,
     EmployeeModel,
+    sequelize,
 } from "../db/db";
+import multerS3 from "multer-s3";
+import { config } from "dotenv";
 import { Op } from "sequelize";
 const positionRouter = Router();
 positionRouter.post("/", async (req, res) => {
@@ -24,6 +30,7 @@ positionRouter.get("/", async (req, res) => {
         res.send(err);
     }
 });
+
 const employeeRouter = Router();
 
 employeeRouter.get("/", async (req, res) => {
@@ -148,9 +155,42 @@ employeeRouter.get("/salary", async (req, res) => {
         res.send(err);
     }
 });
-
-employeeRouter.post("/", async (req, res) => {
+const region = "eu-north-1";
+const accessKeyId = process.env.ACCESS_KEY_ID as string;
+const secretAccessKey = process.env.SECRET_KEY as string;
+const s3 = new S3Client({
+    region,
+    credentials: {
+        accessKeyId,
+        secretAccessKey,
+    },
+});
+const upload = multer({
+    storage: multerS3({
+        s3: s3,
+        bucket: "grandlavash",
+        metadata: async function (req, file, cb) {
+            cb(null, { fieldName: file.fieldname });
+        },
+        key: function (req: any, file, cb) {
+            const extension = file.originalname.split(".").pop();
+            cb(
+                null,
+                req.body.name +
+                    "-" +
+                    req.body.surname +
+                    "-" +
+                    Date.now().toString() +
+                    "." +
+                    extension
+            );
+        },
+    }),
+});
+employeeRouter.post("/", upload.single("avatar"), async (req, res) => {
     try {
+        const file: any = req.file;
+        req.body.avatar = file.key;
         const employee = EmployeeModel.create(req.body);
         res.send("Employee created successfully");
     } catch {
@@ -160,16 +200,55 @@ employeeRouter.post("/", async (req, res) => {
 
 employeeRouter.get("/attendance", async (req, res) => {
     try {
-        const month = req.query.month ? req.query.month : "%";
+        const limit = req.query.limit ? req.query.limit : 10;
+        const offset = req.query.offset ? req.query.offset : 0;
+        const currentDate = new Date();
+        const month = req.query.month
+            ? req.query.month
+            : currentDate.getMonth();
+        const startOfMonth = new Date(
+            currentDate.getFullYear(),
+            month as number,
+            1
+        );
+        const endOfMonth = new Date(
+            currentDate.getFullYear(),
+            (month as number) + 1,
+            0
+        );
         const data = await EmployeeModel.findAll({
-            include: [
-                {
-                    model: AttendanceModel,
-                },
-            ],
-            order: [[AttendanceModel, "date", "ASC"]],
+            limit: limit as number,
+            offset: offset as number,
         });
-        res.send(data);
+        const resp = await Promise.all(
+            data.map(async (element: any) => {
+                const { id } = element;
+                const attendance: any = [];
+                const crntDate = new Date(startOfMonth);
+                while (crntDate <= endOfMonth) {
+                    const attendanceexists = await AttendanceModel.findOne({
+                        where: {
+                            employee_id: id,
+                            date: crntDate,
+                        },
+                        attributes: ["status", "date"],
+                    });
+                    if (attendanceexists) {
+                        attendance.push(attendanceexists);
+                    } else {
+                        attendance.push({
+                            status: "Not Selected",
+                            date: crntDate.toISOString().substr(0, 10),
+                        });
+                    }
+
+                    crntDate.setDate(crntDate.getDate() + 1);
+                }
+
+                return { element, attendance };
+            })
+        );
+        res.send(resp);
     } catch (error) {
         res.send(error);
     }
@@ -181,6 +260,86 @@ employeeRouter.post("/attendance", async (req, res) => {
         res.send(attendance.id);
     } catch (error) {
         res.send(error);
+    }
+});
+employeeRouter.get("/:id", async (req, res) => {
+    try {
+        const currentDate = new Date();
+        const month = req.query.month
+            ? req.query.month
+            : currentDate.getMonth();
+        const startOfMonth = new Date(
+            currentDate.getFullYear(),
+            month as number,
+            1
+        );
+        const endOfMonth = new Date(
+            currentDate.getFullYear(),
+            (month as number) + 1,
+            0
+        );
+        const employee: any = await EmployeeModel.findOne({
+            include: [
+                { model: PositionModel, attributes: ["title", "salary"] },
+                {
+                    model: SalaryModel,
+                    where: {
+                        date: {
+                            [Op.between]: [startOfMonth, endOfMonth],
+                        },
+                    },
+                    required: false,
+                },
+            ],
+            where: {
+                id: req.params.id,
+            },
+        });
+        const attendance: any = [];
+        const crntDate = new Date(startOfMonth);
+        while (crntDate <= endOfMonth) {
+            console.log(crntDate);
+            const attendanceexists = await AttendanceModel.findOne({
+                where: {
+                    employee_id: req.params.id,
+                    date: crntDate,
+                },
+                attributes: ["status", "date"],
+            });
+            if (attendanceexists) {
+                attendance.push(attendanceexists);
+            } else {
+                attendance.push({
+                    status: "Not Selected",
+                    date: crntDate.toISOString().substr(0, 10),
+                });
+            }
+            crntDate.setDate(crntDate.getDate() + 1);
+        }
+        const oylik: any = await SalaryModel.findOne({
+            attributes: [
+                [
+                    sequelize.fn("sum", sequelize.literal('"salary"."amount"')),
+                    "total_sum",
+                ],
+            ],
+        });
+        const paid = oylik.get("total_sum");
+        const counter = await AttendanceModel.count({
+            where: {
+                employee_id: req.params.id,
+                status: true,
+                date: {
+                    [Op.between]: [startOfMonth, endOfMonth],
+                },
+            },
+        });
+        const not_paid = employee.position.salary * counter - paid;
+        const salary_total = { paid, not_paid };
+        employee.avatar = await getObjectSignedUrl(employee.avatar);
+        res.send({ employee, salary_total, attendance });
+    } catch (err) {
+        res.send(err);
     }
 });
 

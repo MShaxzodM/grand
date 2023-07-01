@@ -10,7 +10,7 @@ import { config } from "dotenv";
 
 config();
 
-const bucketName = "rassrochka";
+const bucketName = "grandlavash";
 const region = "eu-north-1";
 const accessKeyId = process.env.ACCESS_KEY_ID as string;
 const secretAccessKey = process.env.SECRET_KEY as string;

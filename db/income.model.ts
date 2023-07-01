@@ -1,4 +1,4 @@
-import { sequelize } from "../db/db";
+import { sequelize } from "./db";
 import { Model, DataTypes } from "sequelize";
 class IncomeModel extends Model {
     id(id: any) {
