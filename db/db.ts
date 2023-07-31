@@ -27,11 +27,11 @@ Product.init(
             allowNull: false,
         },
         category_id: {
-            type: DataTypes.NUMBER,
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         quantity_type: {
-            type: "kg" || "dona" || "litr",
+            type: DataTypes.STRING,
             allowNull: false,
         },
     },
@@ -55,14 +55,14 @@ Products.init(
         // Model attributes are defined here
 
         product_id: {
-            type: DataTypes.NUMBER,
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         quantity: {
-            type: DataTypes.NUMBER,
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
-        price: { type: DataTypes.NUMBER, allowNull: false },
+        price: { type: DataTypes.INTEGER, allowNull: false },
         date: {
             type: DataTypes.DATE,
             allowNull: false,
@@ -86,14 +86,14 @@ History.init(
         // Model attributes are defined here
 
         products_id: {
-            type: DataTypes.NUMBER,
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         type: {
-            type: "kirim" || "chiqim",
+            type: DataTypes.STRING,
         },
         quantity: {
-            type: DataTypes.NUMBER,
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         date: {
@@ -143,7 +143,7 @@ PositionModel.init(
             allowNull: false,
         },
         salary: {
-            type: DataTypes.NUMBER,
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
     },
@@ -173,7 +173,7 @@ EmployeeModel.init(
             allowNull: false,
         },
         position_id: {
-            type: DataTypes.NUMBER,
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         date: {
@@ -191,11 +191,7 @@ EmployeeModel.init(
         phone: {
             type: DataTypes.STRING,
             allowNull: false,
-        },
-        avatar: {
-            type: DataTypes.STRING,
-            allowNull: false,
-        },
+        }
     },
     {
         sequelize, // We need to pass the connection instance
@@ -272,7 +268,7 @@ Product.hasMany(Products, { foreignKey: "product_id" });
 Products.belongsTo(Product, { as: "Maxsulot", foreignKey: "product_id" });
 History.belongsTo(Products, { foreignKey: "products_id" });
 Products.hasMany(History, { foreignKey: "products_id" });
-
+sequelize.sync({force:true})
 export {
     sequelize,
     Product,

@@ -155,39 +155,8 @@ employeeRouter.get("/salary", async (req, res) => {
         res.send(err);
     }
 });
-const region = "eu-north-1";
-const accessKeyId = process.env.ACCESS_KEY_ID as string;
-const secretAccessKey = process.env.SECRET_KEY as string;
-const s3 = new S3Client({
-    region,
-    credentials: {
-        accessKeyId,
-        secretAccessKey,
-    },
-});
-const upload = multer({
-    storage: multerS3({
-        s3: s3,
-        bucket: "grandlavash",
-        metadata: async function (req, file, cb) {
-            cb(null, { fieldName: file.fieldname });
-        },
-        key: function (req: any, file, cb) {
-            const extension = file.originalname.split(".").pop();
-            cb(
-                null,
-                req.body.name +
-                    "-" +
-                    req.body.surname +
-                    "-" +
-                    Date.now().toString() +
-                    "." +
-                    extension
-            );
-        },
-    }),
-});
-employeeRouter.post("/", upload.single("avatar"), async (req, res) => {
+
+employeeRouter.post("/", async (req, res) => {
     try {
         const file: any = req.file;
         req.body.avatar = file.key;

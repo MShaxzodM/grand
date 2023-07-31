@@ -20,7 +20,7 @@ IncomeModel.init(
             allowNull: false,
         },
         type: {
-            type: "bot" || "dostavka" || "kassa",
+            type: DataTypes.STRING,
             allowNull: false,
         },
     },
