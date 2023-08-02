@@ -10,6 +10,7 @@ import { incomeRouter } from "./routes/income";
 import Branch from "./routes/branch";
 import cors from "cors";
 import expense_router from "./routes/expense";
+import authorization from "./routes/authorization";
 // import {  } from "./db/db";
 config();
 const app = express();
@@ -36,6 +37,7 @@ app.use("/stats", StatisticsRouter);
 app.use("/income", incomeRouter);
 app.use("/expense", expense_router);
 app.use("/branch", Branch);
+app.use("/authorization", authorization);
 
 // app.post("/auth", Auth, (req: any, res) => {
 //     res.send("Siz muvaffaqiyatli royhatdan otdingiz");

@@ -1,7 +1,4 @@
 import { Router } from "express";
-import multer from "multer";
-import { S3Client } from "@aws-sdk/client-s3";
-import { deleteFile, getObjectSignedUrl } from "../aws/s3";
 import {
     PositionModel,
     AttendanceModel,
@@ -9,8 +6,6 @@ import {
     EmployeeModel,
     sequelize,
 } from "../db/db";
-import multerS3 from "multer-s3";
-import { config } from "dotenv";
 import { Op } from "sequelize";
 const positionRouter = Router();
 positionRouter.post("/", async (req, res) => {
@@ -83,7 +78,7 @@ employeeRouter.get("/", async (req, res) => {
 employeeRouter.post("/salary", async (req, res) => {
     try {
         const salary = await SalaryModel.create(req.body);
-        res.send(salary.id);
+        res.send(salary);
     } catch (err) {
         res.send(err);
     }
@@ -158,8 +153,6 @@ employeeRouter.get("/salary", async (req, res) => {
 
 employeeRouter.post("/", async (req, res) => {
     try {
-        const file: any = req.file;
-        req.body.avatar = file.key;
         const employee = EmployeeModel.create(req.body);
         res.send("Employee created successfully");
     } catch {
@@ -305,7 +298,6 @@ employeeRouter.get("/:id", async (req, res) => {
         });
         const not_paid = employee.position.salary * counter - paid;
         const salary_total = { paid, not_paid };
-        employee.avatar = await getObjectSignedUrl(employee.avatar);
         res.send({ employee, salary_total, attendance });
     } catch (err) {
         res.send(err);

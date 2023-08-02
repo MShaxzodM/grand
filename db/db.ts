@@ -191,7 +191,7 @@ EmployeeModel.init(
         phone: {
             type: DataTypes.STRING,
             allowNull: false,
-        }
+        },
     },
     {
         sequelize, // We need to pass the connection instance
@@ -200,7 +200,51 @@ EmployeeModel.init(
         modelName: "employee", // We need to choose the model name
     }
 );
+class AuthorizationModel extends Model {
+    id(id: any) {
+        throw new Error("Method not implemented.");
+    }
+}
 
+AuthorizationModel.init(
+    {
+        // Model attributes are defined here
+        name: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        surname: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        role: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        date: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
+        birthday: {
+            type: DataTypes.DATE,
+            allowNull: false,
+        },
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+        phone: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
+    },
+    {
+        sequelize, // We need to pass the connection instance
+        timestamps: false,
+        freezeTableName: true,
+        modelName: "authorization", // We need to choose the model name
+    }
+);
 class AttendanceModel extends Model {
     id(id: any) {
         throw new Error("Method not implemented.");
@@ -268,9 +312,10 @@ Product.hasMany(Products, { foreignKey: "product_id" });
 Products.belongsTo(Product, { as: "Maxsulot", foreignKey: "product_id" });
 History.belongsTo(Products, { foreignKey: "products_id" });
 Products.hasMany(History, { foreignKey: "products_id" });
-sequelize.sync({force:true})
+sequelize.sync({ force: true });
 export {
     sequelize,
+    AuthorizationModel,
     Product,
     Products,
     Category,
