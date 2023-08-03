@@ -18,7 +18,7 @@ router.post("/login", async (req, res) => {
         const username = req.body.name;
         const password = req.body.password;
         const user = AuthorizationModel.findOne({
-            where: { username: username, password: password },
+            where: { name: username, password: password },
         });
         res.send(user);
     } catch (err) {
