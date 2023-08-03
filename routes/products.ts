@@ -10,7 +10,7 @@ productsRouter.post("/", async (req, res) => {
         quantity: req.body.quantity,
         date: req.body.date,
     });
-    res.send(crproduct.id);
+    res.send(crproduct);
 });
 
 productsRouter.get("/", async (req, res) => {

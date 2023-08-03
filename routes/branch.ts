@@ -15,7 +15,7 @@ branch_router.get("/", async (req, res) => {
 branch_router.post("/", async (req, res) => {
     try {
         const idbranch = await BranchModel.create(req.body);
-        res.send(idbranch.id);
+        res.send(idbranch);
     } catch (err) {
         res.send(err);
     }

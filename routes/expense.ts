@@ -6,7 +6,7 @@ const expense_router = Router();
 expense_router.post("/", async (req, res) => {
     try {
         const expense = await OutgoneModel.create(req.body);
-        res.send(expense.id);
+        res.send(expense);
     } catch (err) {
         res.send(err);
     }

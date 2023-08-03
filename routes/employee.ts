@@ -11,7 +11,7 @@ const positionRouter = Router();
 positionRouter.post("/", async (req, res) => {
     try {
         const currentPosition = await PositionModel.create(req.body);
-        res.send(currentPosition.id);
+        res.send(currentPosition);
     } catch (error) {
         console.log(error);
         res.send("Something went wrong");
@@ -219,7 +219,7 @@ employeeRouter.get("/attendance", async (req, res) => {
 employeeRouter.post("/attendance", async (req, res) => {
     try {
         const attendance = await AttendanceModel.create(req.body);
-        res.send(attendance.id);
+        res.send(attendance);
     } catch (error) {
         res.send(error);
     }

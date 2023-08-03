@@ -7,7 +7,7 @@ const incomeRouter = Router();
 incomeRouter.post("/", async (req, res) => {
     try {
         const income = await IncomeModel.create(req.body);
-        res.send(income.id);
+        res.send(income);
     } catch (err) {
         res.send(err);
     }
