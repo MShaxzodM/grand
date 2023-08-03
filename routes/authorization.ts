@@ -13,7 +13,7 @@ router.post("/", async (req, res) => {
     }
 });
 
-router.get("/", async (req, res) => {
+router.post("/login", async (req, res) => {
     try {
         const username = req.body.name;
         const password = req.body.password;

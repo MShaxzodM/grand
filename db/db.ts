@@ -316,7 +316,7 @@ Product.hasMany(Products, { foreignKey: "product_id" });
 Products.belongsTo(Product, { as: "Maxsulot", foreignKey: "product_id" });
 History.belongsTo(Products, { foreignKey: "products_id" });
 Products.hasMany(History, { foreignKey: "products_id" });
-sequelize.sync({ force: true });
+// sequelize.sync({ force: true });
 export {
     sequelize,
     AuthorizationModel,
